@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turnos Berenice 2026</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6B6B">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/calendar--v1.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --dark: #2C3E50;
+            --light: #F7F9FC;
+            --glass: rgba(255, 255, 255, 0.95);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            /* Prevent bounce on iOS PWA */
+            overscroll-behavior-y: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin-top: 10px;
+            padding-bottom: 40px;
+        }
+
+        /* Login Overlay */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            transition: opacity 0.5s;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .login-card h2 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .login-card p {
+            margin-bottom: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .login-btn {
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .greeting {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Hero Card (Next Shift) */
+        .hero-card {
+            background: var(--glass);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .hero-date {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1;
+            margin-bottom: 5px;
+        }
+
+        .hero-day {
+            font-size: 1.3rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .countdown {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            padding: 6px 14px;
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--primary);
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        /* Quick Actions */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-card:active {
+            transform: scale(0.96);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+        }
+
+        /* List */
+        .shifts-list {
+            background: var(--glass);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .list-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shift-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background 0.2s;
+            border-radius: 12px;
+        }
+
+        .shift-item:active {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .shift-item:last-child {
+            border-bottom: none;
+        }
+
+        .date-badge {
+            background: #fff;
+            min-width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .date-day {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .date-month {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 700;
+        }
+
+        .shift-info h3 {
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .shift-info p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .shift-item.done {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login/Welcome Overlay -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <div style="font-size: 3rem; margin-bottom: 10px;">👋</div>
+            <h2>¡Hola Berenice!</h2>
+            <p>Bienvenida a tu calendario de turnos inteligente.</p>
+            <button class="login-btn" onclick="login()">Ingresar</button>
+            <p style="margin-top: 15px; font-size: 0.75rem; color: #999;">Tus recordatorios están activos</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="greeting">Hola, Berenice ✨</div>
+            <button class="settings-btn" onclick="alert('Recordatorios activos via Email')">🔔</button>
+        </header>
+
+        <!-- Hero Section -->
+        <div class="hero-card" id="hero">
+            <div class="hero-title">Próximo Turno</div>
+            <div class="hero-date" id="next-date">---</div>
+            <div class="hero-day" id="next-day">---</div>
+            <div class="countdown" id="countdown">Calculando...</div>
+        </div>
+
+        <div class="actions-grid">
+            <a href="turnos_berenice.ics" class="action-card">
+                <span class="action-icon">📅</span>
+                <span>Sincronizar iPhone</span>
+            </a>
+            <div class="action-card"
+                onclick="alert('Al activar este modo web, los recordatorios te llegarán automáticamente al correo registrado.')">
+                <span class="action-icon">📩</span>
+                <span>Mis Alertas</span>
+            </div>
+        </div>
+
+        <!-- List Section -->
+        <div class="shifts-list">
+            <div class="list-header">
+                <span>Mis Turnos 2026</span>
+                <span style="font-size: 0.8rem; background: #eee; padding: 4px 10px; border-radius: 10px;">Semestre
+                    I</span>
+            </div>
+            <div id="shifts-container">
+                <!-- Javascript will populate this -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+
+        // Login Logic
+        function login() {
+            localStorage.setItem('user_logged', 'true');
+            document.getElementById('login-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-overlay').style.display = 'none';
+            }, 500);
+        }
+
+        // Check login status
+        if (localStorage.getItem('user_logged') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+
+        // Dates Data
+        const turnos = [
+            { date: "2026-01-17", day: "Sábado", label: "17 Ene" },
+            { date: "2026-02-01", day: "Domingo", label: "1 Feb" },
+            { date: "2026-02-21", day: "Sábado", label: "21 Feb" },
+            { date: "2026-03-08", day: "Domingo", label: "8 Mar" },
+            { date: "2026-03-28", day: "Sábado", label: "28 Mar" },
+            { date: "2026-04-12", day: "Domingo", label: "12 Abr" },
+            { date: "2026-05-02", day: "Sábado", label: "2 May" },
+            { date: "2026-05-17", day: "Domingo", label: "17 May" },
+            { date: "2026-06-06", day: "Sábado", label: "6 Jun" },
+            { date: "2026-06-21", day: "Domingo", label: "21 Jun" }
+        ];
+
+        const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+
+        function getRelativeTime(targetDate) {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff < 0) return "Turno en curso o finalizado";
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+            if (days > 0) return `Faltan ${days} días`; // Simplificado para mobile
+            if (hours > 0) return `Faltan ${hours} horas`;
+            return "¡Es hoy!";
+        }
+
+        function init() {
+            const container = document.getElementById('shifts-container');
+            const now = new Date();
+            let nextFound = false;
+
+            turnos.forEach(turno => {
+                const tDate = new Date(turno.date + "T09:00:00");
+                const item = document.createElement('div');
+                item.className = 'shift-item';
+
+                const dayNum = parseInt(turno.date.split('-')[2]);
+                const monthIndex = parseInt(turno.date.split('-')[1]) - 1;
+
+                const tomorrow = new Date(tDate);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const isPast = tomorrow < now;
+
+                if (isPast) {
+                    item.classList.add('done');
+                }
+
+                item.innerHTML = `
+                    <div class="date-badge">
+                        <span class="date-day">${dayNum}</span>
+                        <span class="date-month">${monthNames[monthIndex]}</span>
+                    </div>
+                    <div class="shift-info">
+                        <h3>${turno.day}</h3>
+                        <p>${isPast ? 'Completado' : 'Pendiente'}</p>
+                    </div>
+                `;
+                container.appendChild(item);
+
+                if (!nextFound && !isPast) {
+                    nextFound = true;
+                    document.getElementById('next-date').innerText = turno.label;
+                    document.getElementById('next-day').innerText = turno.day;
+                    document.getElementById('countdown').innerText = getRelativeTime(tDate);
+                }
+            });
+
+            if (!nextFound) {
+                document.getElementById('next-date').innerText = "Libre";
+                document.getElementById('next-day').innerText = "Sin turnos";
+                document.getElementById('countdown').style.display = 'none';
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
