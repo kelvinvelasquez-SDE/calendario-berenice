@@ -1,0 +1,13 @@
+{
+    "name": "calendario-berenice",
+    "version": "1.0.0",
+    "description": "PWA con recordatorios de turnos",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "nodemailer": "^6.9.13",
+        "@netlify/functions": "^2.6.0"
+    }
+}
